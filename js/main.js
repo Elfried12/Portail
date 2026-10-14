@@ -507,18 +507,190 @@ function initNavigation() {
 
   sections.forEach((section) => observer.observe(section));
 }
+/* ---------- 11. Formulaire d'inscription ---------- */
 
-/* =========================================================
-   INITIALISATION
-   ========================================================= */
+const NAME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/;          // lettres (accents compris), espace, tiret, apostrophe
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;       // regex imposée par le sujet
+const PHONE_REGEX = /^\+[1-9]\d{7,14}$/;                // format international E.164 : + indicatif + numéro
+const MOTIVATION_MIN = 50;
+
+// Une fonction de validation par champ : renvoie le message d'erreur, ou '' si c'est valide
+const validators = {
+  firstname: (value) => {
+    if (!value) return 'Le prénom est obligatoire.';
+    if (value.length < 2) return 'Le prénom doit contenir au moins 2 caractères.';
+    if (!NAME_REGEX.test(value)) return 'Le prénom ne peut contenir que des lettres, espaces, tirets ou apostrophes.';
+    return '';
+  },
+
+  lastname: (value) => {
+    if (!value) return 'Le nom est obligatoire.';
+    if (value.length < 2) return 'Le nom doit contenir au moins 2 caractères.';
+    if (!NAME_REGEX.test(value)) return 'Le nom ne peut contenir que des lettres, espaces, tirets ou apostrophes.';
+    return '';
+  },
+
+  email: (value) => {
+    if (!value) return "L'adresse email est obligatoire.";
+    if (!EMAIL_REGEX.test(value)) return 'Adresse email invalide. Exemple : prenom.nom@domaine.com';
+    return '';
+  },
+
+  phone: (value) => {
+    if (!value) return 'Le numéro de téléphone est obligatoire.';
+    // On tolère espaces, points, tirets et parenthèses, retirés avant le test
+    const cleaned = value.replace(/[\s.\-()]/g, '');
+    if (!cleaned.startsWith('+')) return "Le numéro doit commencer par + suivi de l'indicatif du pays (ex : +33).";
+    if (!PHONE_REGEX.test(cleaned)) return 'Numéro invalide : 8 à 15 chiffres après le +. Exemple : +33 6 12 34 56 78';
+    return '';
+  },
+
+  course: (value) => {
+    if ($('#course').disabled) return 'La liste des formations est indisponible. Rechargez la page.';
+    if (!value) return 'Veuillez choisir une formation.';
+    return '';
+  },
+
+  level: (value) => (value ? '' : 'Veuillez indiquer votre niveau.'),
+
+  motivation: (value) => {
+    if (!value) return 'La motivation est obligatoire.';
+    if (value.length < MOTIVATION_MIN) {
+      const missing = MOTIVATION_MIN - value.length;
+      return `Encore ${plural(missing, 'caractère')} pour atteindre le minimum de ${MOTIVATION_MIN}.`;
+    }
+    return '';
+  },
+
+  // Champ optionnel : vide = valide ; rempli = nombre entier entre 0 et 50
+  experience: (value) => {
+    if (!value) return '';
+    const years = Number(value);
+    if (!Number.isInteger(years) || years < 0 || years > 50) {
+      return "L'expérience doit être un nombre entier d'années entre 0 et 50.";
+    }
+    return '';
+  }
+};
+
+// Valide un champ, affiche ou efface son erreur, met à jour son état visuel
+function validateField(field) {
+  const validator = validators[field.name];
+  if (!validator) return true;   // champ sans règle (ex : entreprise)
+
+  const value = field.value.trim();
+  const message = validator(value);
+  const errorBox = document.getElementById(`${field.id}-error`);
+  const isValid = message === '';
+
+  if (errorBox) errorBox.textContent = message;
+  field.classList.toggle('is-invalid', !isValid);
+  // Un champ optionnel laissé vide ne passe pas en vert
+  field.classList.toggle('is-valid', isValid && value !== '');
+  field.setAttribute('aria-invalid', String(!isValid));
+
+  return isValid;
+}
+
+// Compteur de caractères sous la motivation
+function updateMotivationCounter() {
+  const counter = $('#motivation-counter');
+  const length = $('#motivation').value.trim().length;
+  const isComplete = length >= MOTIVATION_MIN;
+
+  counter.textContent = isComplete
+    ? `✓ ${length} caractères : minimum atteint`
+    : `${length} / ${MOTIVATION_MIN} caractères minimum`;
+  counter.classList.toggle('is-complete', isComplete);
+}
+
+// Remet tous les champs dans leur état neutre
+function clearFormStates(form) {
+  form.querySelectorAll('.form-control, .form-select').forEach((field) => {
+    field.classList.remove('is-valid', 'is-invalid');
+    field.removeAttribute('aria-invalid');
+    delete field.dataset.touched;
+  });
+  form.querySelectorAll('.field-error').forEach((errorBox) => {
+    errorBox.textContent = '';
+  });
+}
+
+function showSuccess(form) {
+  const firstname = form.firstname.value.trim();
+  const courseTitle = form.course.options[form.course.selectedIndex].text;
+
+  $('#successModalBody').innerHTML = `
+    <p class="mb-2">Merci <strong>${escapeHTML(firstname)}</strong>, votre demande d'inscription a bien été enregistrée.</p>
+    <p class="mb-2">Formation choisie : <strong>${escapeHTML(courseTitle)}</strong></p>
+    <p class="mb-0">Un conseiller vous contactera à l'adresse <strong>${escapeHTML(form.email.value.trim())}</strong> sous 48 h.</p>`;
+
+  showModal('successModal');
+}
+
+function initForm() {
+  const form = $('#registration-form');
+  if (!form) return;
+
+  const fields = form.querySelectorAll('input, select, textarea');
+
+  fields.forEach((field) => {
+    // Quand on quitte un champ, il devient "touché" et il est validé
+    field.addEventListener('blur', () => {
+      field.dataset.touched = 'true';
+      validateField(field);
+    });
+
+    // Validation en temps réel pendant la saisie, une fois le champ touché
+    // (on ne crie pas "erreur" dès la première lettre tapée)
+    const liveEvent = field.tagName === 'SELECT' ? 'change' : 'input';
+    field.addEventListener(liveEvent, () => {
+      if (field.dataset.touched || field.tagName === 'SELECT') {
+        validateField(field);
+      }
+    });
+  });
+
+  $('#motivation').addEventListener('input', updateMotivationCounter);
+
+  // Validation globale à la soumission
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    // On valide TOUS les champs (map, pas every : every s'arrêterait au premier faux)
+    const results = [...fields].map((field) => {
+      field.dataset.touched = 'true';
+      return validateField(field);
+    });
+
+    if (results.includes(false)) {
+      // Le focus va sur le premier champ en erreur (accessibilité)
+      form.querySelector('.is-invalid')?.focus();
+      return;
+    }
+
+    showSuccess(form);
+
+    // Réinitialisation du formulaire après succès
+    form.reset();
+    clearFormStates(form);
+    updateMotivationCounter();
+  });
+
+  // Bouton "Effacer" : on nettoie aussi les états visuels
+  form.addEventListener('reset', () => {
+    clearFormStates(form);
+    // Le reset natif vide les champs juste après cet événement
+    setTimeout(updateMotivationCounter, 0);
+  });
+}
 function init() {
   handleBrokenImages();
   initNavigation();
   initFilters();
   initModals();
+  initForm();
 
-  // Les deux API sont lancées en parallèle : l'une n'attend pas l'autre,
-  // et si l'une échoue, l'autre s'affiche quand même.
   if ($('#projects-grid')) loadProjects();
   if ($('#courses-grid') || $('#course')) loadCourses();
 }
