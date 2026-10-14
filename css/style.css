@@ -1,20 +1,16 @@
-/* =========================================================
-   WebCraft Solutions — Feuille de style unique
-   Approche mobile-first : styles de base pour 320–767 px,
-   puis media queries pour 768 px et plus (et 992 px).
-   ========================================================= */
+
 
 /* ---------- 1. Variables (charte graphique) ---------- */
 :root {
-  /* Couleurs principales (contrastes vérifiés WCAG AA) */
-  --color-dark: #0b1f3a;          /* bleu nuit : navbar, hero, footer */
-  --color-dark-2: #1e3a8a;        /* bleu profond : dégradés */
-  --color-accent: #fbbf24;        /* ambre : boutons, lien actif */
+  
+  --color-dark: #0b1f3a;          
+  --color-dark-2: #1e3a8a;        
+  --color-accent: #fbbf24;        
   --color-accent-hover: #f59e0b;
-  --color-on-accent: #111827;     /* texte sur fond ambre (~11:1) */
+  --color-on-accent: #111827;     
   --color-light: #ffffff;
   --color-text: #1f2937;
-  --color-muted: #4b5563;         /* gris lisible sur blanc (~7:1) */
+  --color-muted: #4b5563;         
   --color-border: #e5e7eb;
   --color-bg-alt: #f3f4f6;
 
@@ -26,7 +22,6 @@
   --color-info: #1d4ed8;
   --color-info-bg: #dbeafe;
 
-  /* Typo, rayons, ombres, transitions */
   --font-main: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --radius: 0.75rem;
   --radius-pill: 999px;
@@ -35,10 +30,10 @@
   --transition: 0.25s ease;
 }
 
-/* ---------- 2. Base ---------- */
+
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 70px;       /* les ancres ne passent pas sous la navbar sticky */
+  scroll-padding-top: 70px;      
 }
 
 body {
@@ -54,7 +49,7 @@ main {
   flex: 1;                         /* footer toujours en bas de page */
 }
 
-/* Focus clavier bien visible partout (accessibilité) */
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -64,7 +59,7 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* ---------- 3. Navbar ---------- */
+
 .site-nav {
   background-color: var(--color-dark);   /* fond opaque : jamais transparent */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
@@ -73,7 +68,7 @@ textarea:focus-visible {
 .logo {
   font-weight: 800;
   letter-spacing: 0.5px;
-  color: var(--color-light) !important;
+  color: var(--color-light)
 }
 
 .logo span {
@@ -81,7 +76,7 @@ textarea:focus-visible {
 }
 
 .site-nav .nav-link {
-  color: rgba(255, 255, 255, 0.88);      /* contraste > 12:1 sur bleu nuit */
+  color: rgba(255, 255, 255, 0.88);      
   font-weight: 500;
   padding: 0.6rem 0.9rem;
   border-radius: 0.5rem;
@@ -93,7 +88,7 @@ textarea:focus-visible {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Lien actif : couleur + soulignement (pas seulement la couleur) */
+
 .site-nav .nav-link.active {
   color: var(--color-accent);
   text-decoration: underline;
@@ -105,7 +100,6 @@ textarea:focus-visible {
   border: 2px solid rgba(255, 255, 255, 0.6);
 }
 
-/* Menu déplié sur mobile : fond opaque et séparé du logo */
 .site-nav .navbar-collapse {
   background-color: var(--color-dark);
   margin-top: 0.5rem;
@@ -113,7 +107,7 @@ textarea:focus-visible {
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* ---------- 4. Hero (accueil) & en-tête de page (inscription) ---------- */
+
 .hero,
 .page-header {
   background: linear-gradient(135deg, var(--color-dark), var(--color-dark-2));
@@ -132,7 +126,7 @@ textarea:focus-visible {
 .page-title {
   font-size: 2rem;
   font-weight: 800;
-  animation: fadeInUp 0.8s ease-out both;      /* @keyframes obligatoire */
+  animation: fadeInUp 0.8s ease-out both;      
 }
 
 .hero-subtitle,
@@ -155,7 +149,7 @@ textarea:focus-visible {
   animation: fadeInUp 0.8s ease-out 0.4s both;
 }
 
-/* ---------- 5. Animations ---------- */
+
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -165,8 +159,7 @@ textarea:focus-visible {
   to { transform: rotate(360deg); }
 }
 
-/* ---------- 6. Boutons ---------- */
-/* Bouton principal : ambre + texte foncé (~11:1) */
+
 .btn-accent {
   background-color: var(--color-accent);
   color: var(--color-on-accent);
@@ -190,7 +183,7 @@ textarea:focus-visible {
   color: var(--color-muted);
 }
 
-/* Bouton secondaire du hero : contour blanc épais sur fond sombre */
+
 .hero .btn-outline-light {
   border-width: 2px;
   font-weight: 700;
@@ -205,7 +198,7 @@ textarea:focus-visible {
   transform: translateY(-2px);
 }
 
-/* Bouton « Voir détails » des cartes */
+
 .btn-details {
   background-color: transparent;
   color: var(--color-dark-2);
@@ -220,7 +213,7 @@ textarea:focus-visible {
   color: var(--color-light);
 }
 
-/* ---------- 7. Sections ---------- */
+
 .section {
   padding: 3rem 0;
 }
@@ -238,7 +231,7 @@ textarea:focus-visible {
   padding-bottom: 0.5rem;
 }
 
-/* Petit trait décoratif sous les titres */
+
 .section-title::after {
   content: "";
   position: absolute;
@@ -250,7 +243,7 @@ textarea:focus-visible {
   background-color: var(--color-accent);
 }
 
-/* ---------- 8. Filtres ---------- */
+
 .filters .form-control,
 .filters .form-select {
   border-radius: var(--radius);
@@ -270,7 +263,7 @@ textarea:focus-visible {
   margin-bottom: 1rem;
 }
 
-/* ---------- 9. Loader CSS & états ---------- */
+
 .loader-wrapper {
   display: flex;
   justify-content: center;
@@ -286,7 +279,7 @@ textarea:focus-visible {
   animation: spin 0.9s linear infinite;
 }
 
-/* Message quand aucun résultat ne correspond aux filtres */
+
 .empty-state {
   text-align: center;
   color: var(--color-muted);
@@ -295,7 +288,6 @@ textarea:focus-visible {
   border-radius: var(--radius);
 }
 
-/* ---------- 10. Cartes (projets & formations) ---------- */
 .item-card {
   height: 100%;
   display: flex;
@@ -589,7 +581,7 @@ textarea:focus-visible {
   font-weight: 600;
 }
 
-/* Message d'erreur sous chaque champ (vide = invisible) */
+
 .field-error {
   font-size: 0.85rem;
   color: var(--color-error);
